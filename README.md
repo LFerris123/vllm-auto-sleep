@@ -1,4 +1,4 @@
-# vLLM Auto-Sleep Proxy
+# vLLM Auto Sleep
 
 A small asynchronous reverse proxy that lets a vLLM server release most GPU
 memory while idle and wake automatically on the next inference request.
@@ -150,6 +150,14 @@ of changing `SLEEP_LEVEL`.
 
 The proxy blocks known vLLM management and development endpoints, including
 encoded-path variants. It is still an application component, not a complete
-network security product. Keep vLLM on loopback, place authentication and
-transport security at the application gateway, and do not expose the raw vLLM
-management listener.
+network security product and does not implement client authentication.
+
+**Do not expose the proxy directly to untrusted clients.** Authenticate and
+rate-limit requests at the application gateway *before* traffic reaches the
+proxy; otherwise an unauthenticated request could still trigger a model
+wake-up before the upstream rejects it. Keep both vLLM and the proxy on
+loopback, allowlist only the API routes you need at the gateway, and never
+expose the raw vLLM management listener.
+
+This repository contains no hosted model endpoint, deployment address, or
+credential. Cloning it does not grant access to anyone else's vLLM service.
